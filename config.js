@@ -12,3 +12,6 @@
  */
 const SUPABASE_URL = "https://xczffzdxxeaupyjxwgio.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_qy9O8oL5IDfppFZCn4aOVQ__R9JqkEX";
+
+// URL pública del sitio (la que ve el cliente al escanear el QR)
+const SITE_URL = "https://mantenimiento-sage-ten.vercel.app/";
