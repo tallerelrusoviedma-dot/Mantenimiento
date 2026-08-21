@@ -10,5 +10,5 @@
  * la seguridad real la dan las políticas de Row Level Security (RLS)
  * que se crean en supabase-schema.sql.
  */
-const SUPABASE_URL = "https://TU-PROYECTO.supabase.co";
-const SUPABASE_ANON_KEY = "TU_ANON_KEY_ACA";
+const SUPABASE_URL = "https://xczffzdxxeaupyjxwgio.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_qy9O8oL5IDfppFZCn4aOVQ__R9JqkEX";
