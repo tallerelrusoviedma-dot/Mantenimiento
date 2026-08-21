@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Ruso | Cepillado de Tapas y Block</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:       #000a19;
+    --navy-2:     #050f22;
+    --card-bg:    #0b1a30;
+    --card-bg-2:  #0e2038;
+    --blue:       #0d7dd9;
+    --blue-light: #3fa4f0;
+    --orange:     #fb941c;
+    --orange-deep:#d9750a;
+    --white:      #f4f8fc;
+    --silver:     #aab6c4;
+    --line:       rgba(255,255,255,0.08);
+    --font-display: 'Anton', sans-serif;
+    --font-tech: 'Rajdhani', sans-serif;
+    --font-body: 'Inter', sans-serif;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    background:
+      radial-gradient(circle at 8px 8px, rgba(255,255,255,0.035) 1.6px, transparent 1.6px) 0 0/40px 40px,
+      radial-gradient(ellipse at 50% -10%, #0a1930 0%, var(--navy) 55%),
+      var(--navy);
+    color:var(--white);
+    font-family:var(--font-body);
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:0 20px 60px;
+    overflow-x:hidden;
+  }
+
+  /* ---------- LOGIN ADMIN LINK ---------- */
+  .admin-link{
+    position:fixed;
+    top:16px;
+    right:18px;
+    font-family:var(--font-tech);
+    font-weight:600;
+    font-size:11.5px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--silver);
+    text-decoration:none;
+    padding:6px 12px;
+    border:1px solid var(--line);
+    border-radius:6px;
+    background:rgba(11,26,48,0.6);
+    backdrop-filter:blur(4px);
+    transition:color .15s ease, border-color .15s ease;
+    z-index:10;
+  }
+  .admin-link:hover{ color:var(--orange); border-color:rgba(251,148,28,0.4); }
+  .admin-link:focus-visible{ outline:2px solid var(--blue-light); outline-offset:2px; }
+
+  /* ---------- HERO / LOGO ---------- */
+  .hero{
+    width:100%;
+    max-width:720px;
+    display:flex;
+    justify-content:center;
+    padding:36px 0 8px;
+  }
+
+  .logo-frame{
+    position:relative;
+    padding:14px 26px;
+    border-radius:14px;
+    background:linear-gradient(180deg, #06172c 0%, #030c1a 100%);
+    border:1px solid var(--line);
+    box-shadow:
+      0 0 0 1px rgba(251,148,28,0.15),
+      0 20px 50px -20px rgba(0,0,0,0.8),
+      0 0 60px -10px rgba(13,125,217,0.25);
+  }
+
+  .logo-frame::before{
+    content:"";
+    position:absolute;
+    inset:-1px;
+    border-radius:15px;
+    padding:1px;
+    background:linear-gradient(135deg, var(--orange), transparent 35%, transparent 65%, var(--blue));
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor;
+    mask-composite:exclude;
+    opacity:0.6;
+    pointer-events:none;
+  }
+
+  .logo-frame img{
+    display:block;
+    width:min(78vw, 420px);
+    height:auto;
+  }
+
+  /* ---------- LOOKUP SECTION ---------- */
+  .lookup{
+    width:100%;
+    max-width:520px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    margin-top:34px;
+    animation:rise .6s ease-out both;
+  }
+
+  .lookup-label{
+    font-family:var(--font-tech);
+    font-weight:700;
+    letter-spacing:0.16em;
+    font-size:14px;
+    color:var(--silver);
+    margin-bottom:14px;
+    text-align:center;
+  }
+
+  .lookup-label b{color:var(--orange); font-weight:700;}
+
+  form.lookup-form{
+    display:flex;
+    gap:12px;
+    width:100%;
+    align-items:stretch;
+    flex-wrap:wrap;
+    justify-content:center;
+  }
+
+  /* Patente styled like an Argentina/Mercosur license plate */
+  .plate{
+    display:flex;
+    align-items:stretch;
+    height:64px;
+    border-radius:8px;
+    overflow:hidden;
+    box-shadow:0 10px 24px -10px rgba(0,0,0,0.7), 0 0 0 3px #0a1930;
+    flex:1 1 260px;
+    min-width:230px;
+  }
+
+  .plate-band{
+    width:34px;
+    background:linear-gradient(180deg,#1258b0,#0a3f83);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:4px;
+    flex-shrink:0;
+  }
+
+  .plate-band .stars{
+    font-size:8px;
+    color:#ffd23f;
+    line-height:1;
+    letter-spacing:1px;
+  }
+
+  .plate-band .country{
+    writing-mode:vertical-rl;
+    transform:rotate(180deg);
+    font-family:var(--font-tech);
+    font-weight:700;
+    font-size:9px;
+    letter-spacing:0.15em;
+    color:#e9f1fb;
+  }
+
+  .plate input{
+    flex:1;
+    border:none;
+    outline:none;
+    background:#eef2f6;
+    color:#0c1420;
+    font-family:var(--font-tech);
+    font-weight:700;
+    font-size:26px;
+    letter-spacing:0.18em;
+    text-align:center;
+    text-transform:uppercase;
+    padding:0 8px;
+  }
+
+  .plate input::placeholder{
+    color:#8b95a3;
+    font-weight:600;
+    letter-spacing:0.14em;
+  }
+
+  .plate:focus-within{
+    box-shadow:0 10px 24px -10px rgba(0,0,0,0.7), 0 0 0 3px var(--orange);
+  }
+
+  .btn-verificar{
+    font-family:var(--font-tech);
+    font-weight:700;
+    font-size:16px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:#0c1420;
+    background:linear-gradient(180deg, #ffb44d, var(--orange) 55%, var(--orange-deep));
+    border:none;
+    border-radius:8px;
+    padding:0 28px;
+    height:64px;
+    cursor:pointer;
+    box-shadow:0 10px 24px -10px rgba(251,148,28,0.55);
+    transition:transform .15s ease, box-shadow .15s ease, filter .15s ease;
+    flex-shrink:0;
+  }
+
+  .btn-verificar:hover{ transform:translateY(-2px); filter:brightness(1.05); }
+  .btn-verificar:active{ transform:translateY(0px) scale(0.98); }
+  .btn-verificar:focus-visible{ outline:3px solid var(--blue-light); outline-offset:3px; }
+
+  .lookup-msg{
+    margin-top:14px;
+    font-family:var(--font-tech);
+    font-size:14px;
+    font-weight:600;
+    letter-spacing:0.04em;
+    min-height:20px;
+    color:var(--silver);
+  }
+  .lookup-msg.ok{ color:#5fd88a; }
+  .lookup-msg.err{ color:#ff7a6b; }
+
+  /* ---------- CARDS ---------- */
+  .cards{
+    width:100%;
+    max-width:960px;
+    margin-top:40px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:26px;
+  }
+
+  .cards[hidden]{ display:none; }
+
+  @media (max-width:680px){
+    .cards{ grid-template-columns:1fr; }
+  }
+
+  .card{
+    position:relative;
+    background:
+      linear-gradient(155deg, var(--card-bg-2) 0%, var(--card-bg) 55%, #071427 100%);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding-top:52px;
+    padding-bottom:28px;
+    animation:rise .6s ease-out both;
+    box-shadow:0 20px 40px -22px rgba(0,0,0,0.75);
+  }
+
+  .card:nth-child(2){ animation-delay:.08s; }
+
+  .card-tab{
+    position:absolute;
+    top:0;
+    left:50%;
+    transform:translate(-50%,-46%);
+    background:linear-gradient(180deg, #ffb44d, var(--orange) 60%, var(--orange-deep));
+    color:#0c1420;
+    font-family:var(--font-display);
+    font-weight:400;
+    font-size:16px;
+    letter-spacing:0.03em;
+    text-transform:uppercase;
+    padding:9px 22px;
+    clip-path:polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+    white-space:nowrap;
+    box-shadow:0 8px 18px -8px rgba(251,148,28,0.6);
+  }
+
+  .bolt{
+    position:absolute;
+    width:11px;
+    height:11px;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #cfd9e2, #6c7784 60%, #3a424c 100%);
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,0.4);
+  }
+  .bolt-tl{ top:16px; left:16px; }
+  .bolt-tr{ top:16px; right:16px; }
+
+  .card-body{
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+    padding:14px 30px 4px;
+  }
+
+  .stat{
+    display:grid;
+    grid-template-columns:1fr auto auto;
+    align-items:baseline;
+    column-gap:10px;
+    border-bottom:1px dashed var(--line);
+    padding-bottom:12px;
+  }
+
+  .stat:last-child{ border-bottom:none; padding-bottom:0; }
+
+  .stat-label{
+    font-family:var(--font-body);
+    font-size:12.5px;
+    font-weight:600;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--silver);
+  }
+
+  .stat-value{
+    font-family:var(--font-tech);
+    font-weight:700;
+    font-size:26px;
+    letter-spacing:0.03em;
+    color:var(--blue-light);
+    font-variant-numeric:tabular-nums;
+  }
+
+  .stat-unit{
+    font-family:var(--font-tech);
+    font-weight:600;
+    font-size:13px;
+    color:var(--silver);
+  }
+
+  .card-distribucion .stat-value{ color:#ffb44d; }
+
+  /* ---------- FOOTER ---------- */
+  footer{
+    margin-top:auto;
+    padding-top:48px;
+    font-family:var(--font-body);
+    font-size:12px;
+    color:#5b6879;
+    text-align:center;
+  }
+
+  @keyframes rise{
+    from{ opacity:0; transform:translateY(14px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .lookup, .card{ animation:none; }
+    html{ scroll-behavior:auto; }
+  }
+</style>
+</head>
+<body>
+
+  <a href="admin.html" class="admin-link">Login Admin</a>
+
+  <header class="hero">
+    <div class="logo-frame">
+      <img src="logo.png" alt="El Ruso — Cepillado de Tapas y Block">
+    </div>
+  </header>
+
+  <main>
+    <section class="lookup">
+      <p class="lookup-label">INGRESE SU <b>PATENTE</b> PARA CONSULTAR SU VEHÍCULO</p>
+      <form class="lookup-form" id="patente-form" novalidate>
+        <div class="plate">
+          <div class="plate-band">
+            <span class="stars">★★★</span>
+            <span class="country">ARGENTINA</span>
+          </div>
+          <input type="text" id="patente-input" name="patente" maxlength="8" placeholder="AB123CD" autocomplete="off" spellcheck="false" aria-label="Ingrese su patente">
+        </div>
+        <button type="submit" class="btn-verificar">Verificar</button>
+      </form>
+      <p class="lookup-msg" id="lookup-msg" aria-live="polite"></p>
+    </section>
+
+    <section class="cards" id="cards" hidden>
+      <article class="card card-aceite">
+        <div class="bolt bolt-tl"></div>
+        <div class="bolt bolt-tr"></div>
+        <div class="card-tab">Cambio de Aceite</div>
+        <div class="card-body">
+          <div class="stat">
+            <span class="stat-label">Actual</span>
+            <span class="stat-value" id="aceite-actual">00000000</span>
+            <span class="stat-unit">km</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Próximo cambio</span>
+            <span class="stat-value" id="aceite-proximo">00000000</span>
+            <span class="stat-unit">km</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="card card-distribucion">
+        <div class="bolt bolt-tl"></div>
+        <div class="bolt bolt-tr"></div>
+        <div class="card-tab">Distribución</div>
+        <div class="card-body">
+          <div class="stat">
+            <span class="stat-label">Actual</span>
+            <span class="stat-value" id="distribucion-actual">00000000</span>
+            <span class="stat-unit">km</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Próximo cambio</span>
+            <span class="stat-value" id="distribucion-proximo">00000000</span>
+            <span class="stat-unit">km</span>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <footer>El Ruso — Cepillado de Tapas y Block</footer>
+
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const form = document.getElementById('patente-form');
+  const input = document.getElementById('patente-input');
+  const btn = document.querySelector('.btn-verificar');
+  const msg = document.getElementById('lookup-msg');
+  const cards = document.getElementById('cards');
+
+  function pad(valor){
+    return String(valor).replace(/\D/g, '').padStart(8, '0');
+  }
+
+  function mostrarRegistro(r){
+    document.getElementById('aceite-actual').textContent = pad(r.aceite_actual);
+    document.getElementById('aceite-proximo').textContent = pad(r.aceite_proximo);
+    document.getElementById('distribucion-actual').textContent = pad(r.distribucion_actual);
+    document.getElementById('distribucion-proximo').textContent = pad(r.distribucion_proximo);
+    cards.hidden = false;
+  }
+
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    const patente = input.value.trim().toUpperCase().replace(/\s+/g, '');
+
+    if(!patente){
+      msg.textContent = 'Ingresá una patente para continuar.';
+      msg.className = 'lookup-msg err';
+      cards.hidden = true;
+      return;
+    }
+
+    btn.disabled = true;
+    msg.textContent = 'Buscando...';
+    msg.className = 'lookup-msg';
+
+    const { data, error } = await supabaseClient
+      .from('vehiculos')
+      .select('*')
+      .eq('patente', patente)
+      .maybeSingle();
+
+    btn.disabled = false;
+
+    if(error){
+      msg.textContent = 'Ocurrió un error al consultar. Probá de nuevo.';
+      msg.className = 'lookup-msg err';
+      cards.hidden = true;
+      return;
+    }
+
+    if(data){
+      msg.textContent = 'Vehículo encontrado — patente ' + patente;
+      msg.className = 'lookup-msg ok';
+      mostrarRegistro(data);
+    } else {
+      msg.textContent = 'No encontramos esa patente en nuestros registros.';
+      msg.className = 'lookup-msg err';
+      cards.hidden = true;
+    }
+  });
+
+  input.addEventListener('input', function(){
+    input.value = input.value.toUpperCase();
+  });
+</script>
+
+</body>
+</html>

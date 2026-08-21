@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin | El Ruso</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:       #000a19;
+    --card-bg:    #0b1a30;
+    --card-bg-2:  #0e2038;
+    --blue:       #0d7dd9;
+    --blue-light: #3fa4f0;
+    --orange:     #fb941c;
+    --orange-deep:#d9750a;
+    --white:      #f4f8fc;
+    --silver:     #aab6c4;
+    --line:       rgba(255,255,255,0.09);
+    --red:        #ff6b5e;
+    --green:      #5fd88a;
+    --font-display:'Anton', sans-serif;
+    --font-tech:  'Rajdhani', sans-serif;
+    --font-body:  'Inter', sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    background:radial-gradient(ellipse at 50% -10%, #0a1930 0%, var(--navy) 55%), var(--navy);
+    color:var(--white);
+    font-family:var(--font-body);
+    min-height:100vh;
+    padding:36px 20px 60px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+
+  header{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-bottom:34px;
+  }
+  header img{ width:56px; height:auto; border-radius:8px; }
+  header h1{
+    font-family:var(--font-display);
+    font-weight:400;
+    font-size:22px;
+    letter-spacing:0.02em;
+    text-transform:uppercase;
+  }
+  header span{
+    display:block;
+    font-family:var(--font-tech);
+    font-size:12px;
+    letter-spacing:0.14em;
+    color:var(--silver);
+    text-transform:uppercase;
+  }
+
+  .panel{
+    width:100%;
+    max-width:480px;
+    background:linear-gradient(155deg, var(--card-bg-2), var(--card-bg));
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:28px;
+    box-shadow:0 20px 40px -22px rgba(0,0,0,0.75);
+  }
+
+  .panel h2{
+    font-family:var(--font-tech);
+    font-size:15px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--silver);
+    margin-bottom:18px;
+  }
+
+  label{
+    display:block;
+    font-family:var(--font-tech);
+    font-size:12px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--silver);
+    margin:14px 0 6px;
+  }
+
+  input{
+    width:100%;
+    background:#0a1830;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:12px 14px;
+    color:var(--white);
+    font-family:var(--font-tech);
+    font-size:16px;
+    font-weight:600;
+    outline:none;
+  }
+  input:focus{ border-color:var(--blue-light); }
+  input::placeholder{ color:#5b6879; font-weight:500; }
+
+  button{
+    font-family:var(--font-tech);
+    font-weight:700;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    font-size:14px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    transition:transform .12s ease, filter .12s ease;
+  }
+  button:hover{ filter:brightness(1.07); }
+  button:active{ transform:scale(0.98); }
+
+  .btn-primary{
+    width:100%;
+    margin-top:20px;
+    padding:13px;
+    color:#0c1420;
+    background:linear-gradient(180deg, #ffb44d, var(--orange) 55%, var(--orange-deep));
+  }
+
+  .btn-secondary{
+    padding:9px 16px;
+    color:var(--white);
+    background:#132844;
+    border:1px solid var(--line);
+  }
+
+  .btn-danger{
+    padding:9px 14px;
+    color:#fff;
+    background:#5a1d18;
+    border:1px solid rgba(255,107,94,0.35);
+  }
+
+  .form-msg{
+    margin-top:12px;
+    font-family:var(--font-tech);
+    font-size:13px;
+    font-weight:600;
+    min-height:18px;
+  }
+  .form-msg.err{ color:var(--red); }
+  .form-msg.ok{ color:var(--green); }
+
+  #dashboard{ width:100%; max-width:920px; }
+  #dashboard[hidden], #login-panel[hidden]{ display:none; }
+
+  .dash-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:12px;
+    margin-bottom:24px;
+  }
+  .dash-top p{ font-family:var(--font-tech); color:var(--silver); font-size:13px; }
+  .dash-top p b{ color:var(--white); }
+
+  .grid{
+    display:grid;
+    grid-template-columns:1.1fr 1fr;
+    gap:24px;
+    align-items:start;
+  }
+  @media (max-width:800px){ .grid{ grid-template-columns:1fr; } }
+
+  .field-row{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+  table{
+    width:100%;
+    border-collapse:collapse;
+    background:linear-gradient(155deg, var(--card-bg-2), var(--card-bg));
+    border:1px solid var(--line);
+    border-radius:16px;
+    overflow:hidden;
+  }
+  thead th{
+    text-align:left;
+    font-family:var(--font-tech);
+    font-size:11.5px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--silver);
+    padding:14px 12px;
+    border-bottom:1px solid var(--line);
+  }
+  tbody td{
+    padding:12px;
+    font-family:var(--font-tech);
+    font-size:14px;
+    font-weight:600;
+    border-bottom:1px solid var(--line);
+    vertical-align:middle;
+  }
+  tbody tr:last-child td{ border-bottom:none; }
+  tbody td.patente-cell{ color:var(--blue-light); letter-spacing:0.06em; }
+  .row-actions{ display:flex; gap:8px; }
+  #tabla-vacia{
+    padding:22px;
+    text-align:center;
+    color:var(--silver);
+    font-family:var(--font-tech);
+    font-size:13px;
+  }
+
+  #logout-btn{ position:fixed; top:20px; right:20px; }
+</style>
+</head>
+<body>
+
+  <header>
+    <img src="logo.png" alt="El Ruso">
+    <div>
+      <h1>El Ruso</h1>
+      <span>Panel de administración</span>
+    </div>
+  </header>
+
+  <!-- LOGIN -->
+  <section class="panel" id="login-panel">
+    <h2>Iniciar sesión</h2>
+    <form id="login-form">
+      <label for="login-email">Email</label>
+      <input type="email" id="login-email" placeholder="admin@elruso.com" autocomplete="username" required>
+      <label for="login-password">Contraseña</label>
+      <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" required>
+      <button type="submit" class="btn-primary">Entrar</button>
+      <p class="form-msg" id="login-msg" aria-live="polite"></p>
+    </form>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section id="dashboard" hidden>
+    <button id="logout-btn" class="btn-secondary">Cerrar sesión</button>
+    <div class="dash-top">
+      <p>Sesión iniciada como <b id="user-email"></b></p>
+    </div>
+
+    <div class="grid">
+      <!-- Alta / edición -->
+      <div class="panel">
+        <h2 id="form-title">Cargar patente</h2>
+        <form id="vehiculo-form">
+          <label for="v-patente">Patente</label>
+          <input type="text" id="v-patente" placeholder="AB123CD" maxlength="8" required>
+
+          <div class="field-row">
+            <div>
+              <label for="v-aceite-actual">Aceite — actual (km)</label>
+              <input type="number" id="v-aceite-actual" min="0" value="0" required>
+            </div>
+            <div>
+              <label for="v-aceite-proximo">Aceite — próximo (km)</label>
+              <input type="number" id="v-aceite-proximo" min="0" value="0" required>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div>
+              <label for="v-dist-actual">Distribución — actual (km)</label>
+              <input type="number" id="v-dist-actual" min="0" value="0" required>
+            </div>
+            <div>
+              <label for="v-dist-proximo">Distribución — próximo (km)</label>
+              <input type="number" id="v-dist-proximo" min="0" value="0" required>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary" id="v-submit-btn">Guardar</button>
+          <button type="button" class="btn-secondary" id="v-cancel-btn" style="width:100%;margin-top:10px;display:none;">Cancelar edición</button>
+          <p class="form-msg" id="vehiculo-msg" aria-live="polite"></p>
+        </form>
+      </div>
+
+      <!-- Listado -->
+      <div>
+        <table>
+          <thead>
+            <tr>
+              <th>Patente</th>
+              <th>Aceite</th>
+              <th>Distribución</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="tabla-body"></tbody>
+        </table>
+        <p id="tabla-vacia" hidden>Todavía no cargaste ninguna patente.</p>
+      </div>
+    </div>
+  </section>
+
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const loginPanel   = document.getElementById('login-panel');
+    const loginForm    = document.getElementById('login-form');
+    const loginMsg     = document.getElementById('login-msg');
+
+    const dashboard    = document.getElementById('dashboard');
+    const userEmailEl  = document.getElementById('user-email');
+    const logoutBtn    = document.getElementById('logout-btn');
+
+    const vForm         = document.getElementById('vehiculo-form');
+    const vPatente       = document.getElementById('v-patente');
+    const vAceiteActual  = document.getElementById('v-aceite-actual');
+    const vAceiteProximo = document.getElementById('v-aceite-proximo');
+    const vDistActual    = document.getElementById('v-dist-actual');
+    const vDistProximo   = document.getElementById('v-dist-proximo');
+    const vMsg           = document.getElementById('vehiculo-msg');
+    const vSubmitBtn     = document.getElementById('v-submit-btn');
+    const vCancelBtn     = document.getElementById('v-cancel-btn');
+    const formTitle      = document.getElementById('form-title');
+
+    const tablaBody   = document.getElementById('tabla-body');
+    const tablaVacia  = document.getElementById('tabla-vacia');
+
+    let editandoPatente = null; // null = alta nueva, string = editando esa patente
+
+    // ---------- SESIÓN ----------
+    async function checkSession(){
+      const { data:{ session } } = await supabaseClient.auth.getSession();
+      if(session){
+        mostrarDashboard(session.user.email);
+      } else {
+        mostrarLogin();
+      }
+    }
+
+    function mostrarLogin(){
+      loginPanel.hidden = false;
+      dashboard.hidden = true;
+    }
+
+    function mostrarDashboard(email){
+      loginPanel.hidden = true;
+      dashboard.hidden = false;
+      userEmailEl.textContent = email;
+      cargarTabla();
+    }
+
+    loginForm.addEventListener('submit', async function(e){
+      e.preventDefault();
+      loginMsg.textContent = 'Ingresando...';
+      loginMsg.className = 'form-msg';
+
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+      if(error){
+        loginMsg.textContent = 'Email o contraseña incorrectos.';
+        loginMsg.className = 'form-msg err';
+        return;
+      }
+      loginMsg.textContent = '';
+      mostrarDashboard(data.user.email);
+    });
+
+    logoutBtn.addEventListener('click', async function(){
+      await supabaseClient.auth.signOut();
+      mostrarLogin();
+    });
+
+    // ---------- TABLA ----------
+    async function cargarTabla(){
+      const { data, error } = await supabaseClient
+        .from('vehiculos')
+        .select('*')
+        .order('updated_at', { ascending:false });
+
+      tablaBody.innerHTML = '';
+
+      if(error || !data || data.length === 0){
+        tablaVacia.hidden = false;
+        return;
+      }
+      tablaVacia.hidden = true;
+
+      data.forEach(function(r){
+        const tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td class="patente-cell">' + r.patente + '</td>' +
+          '<td>' + r.aceite_actual + ' → ' + r.aceite_proximo + ' km</td>' +
+          '<td>' + r.distribucion_actual + ' → ' + r.distribucion_proximo + ' km</td>' +
+          '<td class="row-actions">' +
+            '<button type="button" class="btn-secondary" data-edit="' + r.patente + '">Editar</button>' +
+            '<button type="button" class="btn-danger" data-del="' + r.patente + '">Borrar</button>' +
+          '</td>';
+        tablaBody.appendChild(tr);
+      });
+
+      tablaBody.querySelectorAll('[data-edit]').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          const patente = btn.getAttribute('data-edit');
+          const registro = data.find(function(x){ return x.patente === patente; });
+          if(registro) cargarEnFormulario(registro);
+        });
+      });
+
+      tablaBody.querySelectorAll('[data-del]').forEach(function(btn){
+        btn.addEventListener('click', async function(){
+          const patente = btn.getAttribute('data-del');
+          if(!confirm('¿Borrar la patente ' + patente + '?')) return;
+          await supabaseClient.from('vehiculos').delete().eq('patente', patente);
+          cargarTabla();
+        });
+      });
+    }
+
+    function cargarEnFormulario(r){
+      editandoPatente = r.patente;
+      vPatente.value = r.patente;
+      vPatente.disabled = true;
+      vAceiteActual.value = r.aceite_actual;
+      vAceiteProximo.value = r.aceite_proximo;
+      vDistActual.value = r.distribucion_actual;
+      vDistProximo.value = r.distribucion_proximo;
+      formTitle.textContent = 'Editando ' + r.patente;
+      vSubmitBtn.textContent = 'Guardar cambios';
+      vCancelBtn.style.display = 'block';
+      vMsg.textContent = '';
+    }
+
+    function resetFormulario(){
+      editandoPatente = null;
+      vForm.reset();
+      vPatente.disabled = false;
+      formTitle.textContent = 'Cargar patente';
+      vSubmitBtn.textContent = 'Guardar';
+      vCancelBtn.style.display = 'none';
+    }
+
+    vCancelBtn.addEventListener('click', resetFormulario);
+
+    vForm.addEventListener('submit', async function(e){
+      e.preventDefault();
+      const patente = vPatente.value.trim().toUpperCase().replace(/\s+/g, '');
+
+      if(!patente){
+        vMsg.textContent = 'La patente es obligatoria.';
+        vMsg.className = 'form-msg err';
+        return;
+      }
+
+      const registro = {
+        patente: editandoPatente || patente,
+        aceite_actual: Number(vAceiteActual.value) || 0,
+        aceite_proximo: Number(vAceiteProximo.value) || 0,
+        distribucion_actual: Number(vDistActual.value) || 0,
+        distribucion_proximo: Number(vDistProximo.value) || 0
+      };
+
+      vSubmitBtn.disabled = true;
+      const { error } = await supabaseClient.from('vehiculos').upsert(registro);
+      vSubmitBtn.disabled = false;
+
+      if(error){
+        vMsg.textContent = 'Error al guardar: ' + error.message;
+        vMsg.className = 'form-msg err';
+        return;
+      }
+
+      vMsg.textContent = 'Guardado correctamente.';
+      vMsg.className = 'form-msg ok';
+      resetFormulario();
+      cargarTabla();
+    });
+
+    vPatente.addEventListener('input', function(){
+      vPatente.value = vPatente.value.toUpperCase();
+    });
+
+    checkSession();
+  </script>
+</body>
+</html>
