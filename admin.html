@@ -387,7 +387,7 @@
   }
 
   /* ---------- HISTORIAL DE SERVICIOS ---------- */
-  .historial-servicios{ margin-top:16px; }
+  .historial-servicios{ margin-top:0; }
   .historial-label{
     font-family:var(--font-tech);
     font-size:12px;
@@ -663,6 +663,15 @@
       </div>
     </div>
 
+    <!-- SERVICIOS GENERADOS -->
+    <div class="servicio-section historial-section">
+      <h2>Servicios Generados para esta Patente</h2>
+      <div class="historial-servicios">
+        <ul class="historial-list" id="s-historial-list"></ul>
+        <p class="campo-hint" id="s-historial-vacio" hidden>Todavía no hay servicios cargados para esta patente.</p>
+      </div>
+    </div>
+
     <!-- GENERAR SERVICIO -->
     <div class="servicio-section">
       <h2>Generar Servicio:</h2>
@@ -670,12 +679,6 @@
         <label for="s-patente">Patente</label>
         <input type="text" id="s-patente" placeholder="AB123CD" maxlength="8" required>
         <p class="campo-hint">Se completa sola si tocaste "Editar" en una patente de la tabla de arriba.</p>
-
-        <div class="historial-servicios">
-          <p class="historial-label">Servicios cargados para esta patente</p>
-          <ul class="historial-list" id="s-historial-list"></ul>
-          <p class="campo-hint" id="s-historial-vacio" hidden>Todavía no hay servicios cargados para esta patente.</p>
-        </div>
 
         <label for="s-fecha">Fecha de Servicio</label>
         <input type="date" id="s-fecha" required>
@@ -818,6 +821,7 @@
       dashboard.hidden = false;
       userEmailEl.textContent = email;
       cargarTabla();
+      cargarHistorialServicios('');
     }
 
     loginForm.addEventListener('submit', async function(e){
@@ -1047,7 +1051,8 @@
       serviciosCache = [];
 
       if(!patente){
-        vacioEl.hidden = true;
+        vacioEl.textContent = 'Editá o escribí una patente en "Generar Servicio" para ver su historial.';
+        vacioEl.hidden = false;
         return;
       }
 
@@ -1058,6 +1063,7 @@
         .order('fecha_servicio', { ascending: false });
 
       if(error || !data || data.length === 0){
+        vacioEl.textContent = 'Todavía no hay servicios cargados para esta patente.';
         vacioEl.hidden = false;
         return;
       }
