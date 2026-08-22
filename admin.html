@@ -400,7 +400,7 @@
     list-style:none;
     display:flex;
     flex-direction:column;
-    gap:8px;
+    gap:12px;
   }
   .historial-list li{
     display:flex;
@@ -409,8 +409,10 @@
     gap:12px;
     background:#0a1830;
     border:1px solid var(--line);
+    border-left:3px solid var(--orange);
     border-radius:8px;
-    padding:10px 14px;
+    padding:12px 16px;
+    box-shadow:0 6px 14px -10px rgba(0,0,0,0.6);
   }
   .historial-info{ display:flex; flex-direction:column; gap:2px; min-width:0; }
   .historial-fecha{ font-family:var(--font-tech); font-weight:700; font-size:14px; color:var(--white); }
@@ -422,6 +424,7 @@
     overflow:hidden;
     text-overflow:ellipsis;
   }
+  .historial-actions{ display:flex; gap:8px; flex-shrink:0; }
   .btn-ver-servicio{
     flex-shrink:0;
     padding:8px 14px;
@@ -429,6 +432,14 @@
     color:var(--white);
     background:#132844;
     border:1px solid var(--line);
+  }
+  .btn-eliminar-servicio{
+    flex-shrink:0;
+    padding:8px 14px;
+    font-size:12px;
+    color:#fff;
+    background:#5a1d18;
+    border:1px solid rgba(255,107,94,0.35);
   }
 
   /* ---------- MODAL VER SERVICIO ---------- */
@@ -1073,10 +1084,46 @@
         btnVer.textContent = 'Ver Servicio';
         btnVer.addEventListener('click', function(){ abrirModalServicio(s.id); });
 
+        const btnEliminar = document.createElement('button');
+        btnEliminar.type = 'button';
+        btnEliminar.className = 'btn-eliminar-servicio';
+        btnEliminar.textContent = 'Eliminar';
+        btnEliminar.addEventListener('click', function(){ eliminarServicio(s, patente); });
+
+        const acciones = document.createElement('div');
+        acciones.className = 'historial-actions';
+        acciones.appendChild(btnVer);
+        acciones.appendChild(btnEliminar);
+
         li.appendChild(info);
-        li.appendChild(btnVer);
+        li.appendChild(acciones);
         listEl.appendChild(li);
       });
+    }
+
+    async function eliminarServicio(s, patente){
+      if(!confirm('¿Eliminar el servicio "' + s.tipo_servicio + '" del ' + formatearFecha(s.fecha_servicio) + '?')) return;
+
+      const { error } = await supabaseClient.from('servicios').delete().eq('id', s.id);
+      if(error){
+        alert('Error al eliminar: ' + error.message);
+        return;
+      }
+
+      // Borrado best-effort de las fotos asociadas en Storage
+      const paths = (s.fotos || [])
+        .map(function(url){
+          const marcador = '/fotos-servicios/';
+          const i = url.indexOf(marcador);
+          return i === -1 ? null : url.slice(i + marcador.length);
+        })
+        .filter(Boolean);
+      if(paths.length > 0){
+        try{ await supabaseClient.storage.from('fotos-servicios').remove(paths); }
+        catch(err){ console.error(err); }
+      }
+
+      cargarHistorialServicios(patente);
     }
 
     function abrirModalServicio(id){
