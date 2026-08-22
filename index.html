@@ -289,6 +289,123 @@
   .btn-whatsapp:focus-visible{ outline:3px solid var(--blue-light); outline-offset:3px; }
   .btn-whatsapp svg{ width:20px; height:20px; flex-shrink:0; }
 
+  /* ---------- SERVICIOS REALIZADOS ---------- */
+  .servicios-section{
+    width:100%;
+    max-width:960px;
+    margin-top:40px;
+  }
+  .servicios-section[hidden]{ display:none; }
+
+  .servicios-title{
+    font-family:var(--font-display);
+    font-weight:400;
+    font-size:24px;
+    letter-spacing:0.02em;
+    text-transform:uppercase;
+    text-align:center;
+    color:var(--white);
+    margin-bottom:20px;
+  }
+
+  .servicios-vacio{
+    text-align:center;
+    font-family:var(--font-tech);
+    font-size:14px;
+    color:var(--silver);
+  }
+
+  .servicios-list{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+  }
+
+  .servicio-card{
+    position:relative;
+    background:linear-gradient(155deg, var(--card-bg-2) 0%, var(--card-bg) 55%, #071427 100%);
+    border:1px solid var(--line);
+    border-left:4px solid var(--orange);
+    border-radius:14px;
+    padding:22px 24px;
+    box-shadow:0 16px 34px -20px rgba(0,0,0,0.7);
+  }
+
+  .servicio-card-top{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:8px 16px;
+    margin-bottom:14px;
+  }
+
+  .servicio-tipo{
+    font-family:var(--font-tech);
+    font-weight:700;
+    font-size:17px;
+    color:var(--blue-light);
+    letter-spacing:0.02em;
+  }
+
+  .servicio-fecha{
+    font-family:var(--font-tech);
+    font-weight:600;
+    font-size:13px;
+    color:var(--silver);
+    letter-spacing:0.03em;
+  }
+
+  .servicio-block{ margin-top:12px; }
+  .servicio-block:first-child{ margin-top:0; }
+
+  .servicio-block h4{
+    font-family:var(--font-body);
+    font-size:11.5px;
+    font-weight:600;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--silver);
+    margin-bottom:6px;
+  }
+
+  .servicio-trabajos{
+    list-style:disc;
+    padding-left:20px;
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
+  .servicio-trabajos li{
+    font-family:var(--font-body);
+    font-size:14px;
+    color:var(--white);
+    line-height:1.4;
+  }
+
+  .servicio-observaciones{
+    font-family:var(--font-body);
+    font-size:14px;
+    color:var(--white);
+    line-height:1.5;
+  }
+
+  .servicio-fotos{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .servicio-fotos a{
+    display:block;
+    width:88px;
+    height:88px;
+    border-radius:8px;
+    overflow:hidden;
+    border:1px solid var(--line);
+    flex-shrink:0;
+  }
+  .servicio-fotos img{ width:100%; height:100%; object-fit:cover; display:block; }
+
   /* ---------- CARDS ---------- */
   .cards{
     width:100%;
@@ -486,6 +603,12 @@
         Solicitar Turno de Servicio
       </a>
     </div>
+
+    <section class="servicios-section" id="servicios-section" hidden>
+      <h2 class="servicios-title">Servicios Realizados</h2>
+      <div class="servicios-list" id="servicios-list"></div>
+      <p class="servicios-vacio" id="servicios-vacio" hidden>Todavía no hay servicios cargados para este vehículo.</p>
+    </section>
   </main>
 
   <footer>El Ruso — Cepillado de Tapas y Block</footer>
@@ -505,9 +628,110 @@
   const vehiculoInfo = document.getElementById('vehiculo-info');
   const whatsappWrap = document.getElementById('whatsapp-wrap');
   const whatsappBtn = document.getElementById('whatsapp-btn');
+  const serviciosSection = document.getElementById('servicios-section');
+  const serviciosList = document.getElementById('servicios-list');
+  const serviciosVacio = document.getElementById('servicios-vacio');
 
   function pad(valor){
     return String(valor).replace(/\D/g, '').padStart(8, '0');
+  }
+
+  function formatearFecha(iso){
+    if(!iso) return '';
+    const partes = iso.split('-');
+    return partes[2] + '/' + partes[1] + '/' + partes[0];
+  }
+
+  async function mostrarServicios(patente){
+    serviciosSection.hidden = false;
+    serviciosList.innerHTML = '';
+    serviciosVacio.hidden = true;
+
+    const { data, error } = await supabaseClient
+      .from('servicios')
+      .select('*')
+      .eq('patente', patente)
+      .order('fecha_servicio', { ascending: false });
+
+    if(error || !data || data.length === 0){
+      serviciosVacio.hidden = false;
+      return;
+    }
+
+    data.forEach(function(s){
+      const card = document.createElement('article');
+      card.className = 'servicio-card';
+
+      const top = document.createElement('div');
+      top.className = 'servicio-card-top';
+      const tipo = document.createElement('span');
+      tipo.className = 'servicio-tipo';
+      tipo.textContent = s.tipo_servicio;
+      const fecha = document.createElement('span');
+      fecha.className = 'servicio-fecha';
+      fecha.textContent = formatearFecha(s.fecha_servicio);
+      top.appendChild(tipo);
+      top.appendChild(fecha);
+      card.appendChild(top);
+
+      const trabajos = s.trabajos_realizados || [];
+      if(trabajos.length > 0){
+        const bloque = document.createElement('div');
+        bloque.className = 'servicio-block';
+        const h4 = document.createElement('h4');
+        h4.textContent = 'Trabajos Realizados';
+        const ul = document.createElement('ul');
+        ul.className = 'servicio-trabajos';
+        trabajos.forEach(function(t){
+          const li = document.createElement('li');
+          li.textContent = t;
+          ul.appendChild(li);
+        });
+        bloque.appendChild(h4);
+        bloque.appendChild(ul);
+        card.appendChild(bloque);
+      }
+
+      if(s.observaciones){
+        const bloque = document.createElement('div');
+        bloque.className = 'servicio-block';
+        const h4 = document.createElement('h4');
+        h4.textContent = 'Observaciones';
+        const p = document.createElement('p');
+        p.className = 'servicio-observaciones';
+        p.textContent = s.observaciones;
+        bloque.appendChild(h4);
+        bloque.appendChild(p);
+        card.appendChild(bloque);
+      }
+
+      const fotos = s.fotos || [];
+      if(fotos.length > 0){
+        const bloque = document.createElement('div');
+        bloque.className = 'servicio-block';
+        const h4 = document.createElement('h4');
+        h4.textContent = 'Registro Fotográfico';
+        const grid = document.createElement('div');
+        grid.className = 'servicio-fotos';
+        fotos.forEach(function(url){
+          const a = document.createElement('a');
+          a.href = url;
+          a.target = '_blank';
+          a.rel = 'noopener';
+          const img = document.createElement('img');
+          img.src = url;
+          img.alt = 'Foto del servicio';
+          img.loading = 'lazy';
+          a.appendChild(img);
+          grid.appendChild(a);
+        });
+        bloque.appendChild(h4);
+        bloque.appendChild(grid);
+        card.appendChild(bloque);
+      }
+
+      serviciosList.appendChild(card);
+    });
   }
 
   function mostrarRegistro(r){
@@ -528,6 +752,8 @@
     const mensaje = 'Hola! Quiero solicitar un turno de servicio para mi vehículo, patente ' + r.patente + '.';
     whatsappBtn.href = 'https://wa.me/' + WHATSAPP_NUMERO + '?text=' + encodeURIComponent(mensaje);
     whatsappWrap.hidden = false;
+
+    mostrarServicios(r.patente);
   }
 
   form.addEventListener('submit', async function(e){
@@ -540,6 +766,7 @@
       cards.hidden = true;
       vehiculoInfo.hidden = true;
       whatsappWrap.hidden = true;
+      serviciosSection.hidden = true;
       return;
     }
 
@@ -561,6 +788,7 @@
       cards.hidden = true;
       vehiculoInfo.hidden = true;
       whatsappWrap.hidden = true;
+      serviciosSection.hidden = true;
       return;
     }
 
@@ -574,6 +802,7 @@
       cards.hidden = true;
       vehiculoInfo.hidden = true;
       whatsappWrap.hidden = true;
+      serviciosSection.hidden = true;
     }
   });
 
