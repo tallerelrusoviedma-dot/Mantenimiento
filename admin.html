@@ -717,6 +717,30 @@
     </div>
   </section>
 
+  <!-- MODAL VER SERVICIO -->
+  <div class="modal-overlay" id="servicio-modal" hidden>
+    <div class="modal-card">
+      <button type="button" class="modal-close" id="modal-close-btn">✕</button>
+      <h3 id="modal-tipo"></h3>
+      <p class="modal-sub" id="modal-sub"></p>
+
+      <div class="modal-section" id="modal-trabajos-section">
+        <h4>Trabajos Realizados</h4>
+        <ul class="modal-trabajos" id="modal-trabajos"></ul>
+      </div>
+
+      <div class="modal-section" id="modal-observaciones-section">
+        <h4>Observaciones</h4>
+        <p id="modal-observaciones"></p>
+      </div>
+
+      <div class="modal-section" id="modal-fotos-section">
+        <h4>Registro Fotográfico</h4>
+        <div class="modal-fotos" id="modal-fotos"></div>
+      </div>
+    </div>
+  </div>
+
   <script src="config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -1241,29 +1265,7 @@
     });
 
     checkSession();
-  </script>  <!-- MODAL VER SERVICIO -->
-  <div class="modal-overlay" id="servicio-modal" hidden>
-    <div class="modal-card">
-      <button type="button" class="modal-close" id="modal-close-btn">✕</button>
-      <h3 id="modal-tipo"></h3>
-      <p class="modal-sub" id="modal-sub"></p>
-
-      <div class="modal-section" id="modal-trabajos-section">
-        <h4>Trabajos Realizados</h4>
-        <ul class="modal-trabajos" id="modal-trabajos"></ul>
-      </div>
-
-      <div class="modal-section" id="modal-observaciones-section">
-        <h4>Observaciones</h4>
-        <p id="modal-observaciones"></p>
-      </div>
-
-      <div class="modal-section" id="modal-fotos-section">
-        <h4>Registro Fotográfico</h4>
-        <div class="modal-fotos" id="modal-fotos"></div>
-      </div>
-    </div>
-  </div>
+  </script>
 
 </body>
 </html>
