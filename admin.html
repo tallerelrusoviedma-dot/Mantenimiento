@@ -386,6 +386,150 @@
     margin-top:6px;
   }
 
+  /* ---------- HISTORIAL DE SERVICIOS ---------- */
+  .historial-servicios{ margin-top:16px; }
+  .historial-label{
+    font-family:var(--font-tech);
+    font-size:12px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--silver);
+    margin-bottom:8px;
+  }
+  .historial-list{
+    list-style:none;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .historial-list li{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    background:#0a1830;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px 14px;
+  }
+  .historial-info{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+  .historial-fecha{ font-family:var(--font-tech); font-weight:700; font-size:14px; color:var(--white); }
+  .historial-tipo{
+    font-family:var(--font-body);
+    font-size:12px;
+    color:var(--silver);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .btn-ver-servicio{
+    flex-shrink:0;
+    padding:8px 14px;
+    font-size:12px;
+    color:var(--white);
+    background:#132844;
+    border:1px solid var(--line);
+  }
+
+  /* ---------- MODAL VER SERVICIO ---------- */
+  .modal-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,10,25,0.78);
+    backdrop-filter:blur(3px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    z-index:100;
+  }
+  .modal-overlay[hidden]{ display:none; }
+  .modal-card{
+    width:100%;
+    max-width:540px;
+    max-height:88vh;
+    overflow-y:auto;
+    background:linear-gradient(155deg, var(--card-bg-2), var(--card-bg));
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:30px 26px 26px;
+    position:relative;
+    box-shadow:0 30px 60px -20px rgba(0,0,0,0.7);
+  }
+  .modal-close{
+    position:absolute;
+    top:16px;
+    right:16px;
+    width:30px;
+    height:30px;
+    border-radius:50%;
+    background:#132844;
+    color:var(--white);
+    font-size:15px;
+    line-height:1;
+    padding:0;
+  }
+  .modal-card h3{
+    font-family:var(--font-display);
+    font-weight:400;
+    font-size:21px;
+    letter-spacing:0.02em;
+    text-transform:uppercase;
+    margin-bottom:4px;
+    padding-right:30px;
+  }
+  .modal-sub{
+    font-family:var(--font-tech);
+    font-weight:600;
+    font-size:13px;
+    color:var(--silver);
+    margin-bottom:22px;
+  }
+  .modal-section{ margin-bottom:18px; }
+  .modal-section:last-child{ margin-bottom:0; }
+  .modal-section[hidden]{ display:none; }
+  .modal-section h4{
+    font-family:var(--font-tech);
+    font-size:11.5px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--silver);
+    margin-bottom:8px;
+  }
+  .modal-section p{
+    font-family:var(--font-body);
+    font-size:14px;
+    color:var(--white);
+    line-height:1.5;
+  }
+  .modal-trabajos{
+    list-style:disc;
+    padding-left:20px;
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+  }
+  .modal-trabajos li{
+    font-family:var(--font-body);
+    font-size:14px;
+    color:var(--white);
+    line-height:1.4;
+  }
+  .modal-fotos{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .modal-fotos a{
+    display:block;
+    width:92px;
+    height:92px;
+    border-radius:8px;
+    overflow:hidden;
+    border:1px solid var(--line);
+  }
+  .modal-fotos img{ width:100%; height:100%; object-fit:cover; display:block; }
+
   @media print{
     body *{ visibility:hidden; }
     .qr-print-card, .qr-print-card *{ visibility:visible; }
@@ -515,6 +659,12 @@
         <label for="s-patente">Patente</label>
         <input type="text" id="s-patente" placeholder="AB123CD" maxlength="8" required>
         <p class="campo-hint">Se completa sola si tocaste "Editar" en una patente de la tabla de arriba.</p>
+
+        <div class="historial-servicios">
+          <p class="historial-label">Servicios cargados para esta patente</p>
+          <ul class="historial-list" id="s-historial-list"></ul>
+          <p class="campo-hint" id="s-historial-vacio" hidden>Todavía no hay servicios cargados para esta patente.</p>
+        </div>
 
         <label for="s-fecha">Fecha de Servicio</label>
         <input type="date" id="s-fecha" required>
@@ -730,6 +880,7 @@
       vCancelBtn.style.display = 'block';
       vMsg.textContent = '';
       sPatente.value = r.patente;
+      cargarHistorialServicios(r.patente);
     }
 
     function resetFormulario(){
@@ -843,6 +994,114 @@
         e.preventDefault();
         agregarTrabajo();
       }
+    });
+
+    // -- Historial de servicios de la patente --
+    let serviciosCache = [];
+
+    function formatearFecha(iso){
+      if(!iso) return '';
+      const partes = iso.split('-');
+      return partes[2] + '/' + partes[1] + '/' + partes[0];
+    }
+
+    async function cargarHistorialServicios(patente){
+      const listEl = document.getElementById('s-historial-list');
+      const vacioEl = document.getElementById('s-historial-vacio');
+      listEl.innerHTML = '';
+      serviciosCache = [];
+
+      if(!patente){
+        vacioEl.hidden = true;
+        return;
+      }
+
+      const { data, error } = await supabaseClient
+        .from('servicios')
+        .select('*')
+        .eq('patente', patente)
+        .order('fecha_servicio', { ascending: false });
+
+      if(error || !data || data.length === 0){
+        vacioEl.hidden = false;
+        return;
+      }
+      vacioEl.hidden = true;
+      serviciosCache = data;
+
+      data.forEach(function(s){
+        const li = document.createElement('li');
+
+        const info = document.createElement('div');
+        info.className = 'historial-info';
+        const fecha = document.createElement('span');
+        fecha.className = 'historial-fecha';
+        fecha.textContent = formatearFecha(s.fecha_servicio);
+        const tipo = document.createElement('span');
+        tipo.className = 'historial-tipo';
+        tipo.textContent = s.tipo_servicio;
+        info.appendChild(fecha);
+        info.appendChild(tipo);
+
+        const btnVer = document.createElement('button');
+        btnVer.type = 'button';
+        btnVer.className = 'btn-ver-servicio';
+        btnVer.textContent = 'Ver Servicio';
+        btnVer.addEventListener('click', function(){ abrirModalServicio(s.id); });
+
+        li.appendChild(info);
+        li.appendChild(btnVer);
+        listEl.appendChild(li);
+      });
+    }
+
+    function abrirModalServicio(id){
+      const s = serviciosCache.find(function(x){ return x.id === id; });
+      if(!s) return;
+
+      document.getElementById('modal-tipo').textContent = s.tipo_servicio;
+      document.getElementById('modal-sub').textContent = 'Patente ' + s.patente + ' — ' + formatearFecha(s.fecha_servicio);
+
+      const trabajos = s.trabajos_realizados || [];
+      const trabajosEl = document.getElementById('modal-trabajos');
+      trabajosEl.innerHTML = '';
+      trabajos.forEach(function(t){
+        const li = document.createElement('li');
+        li.textContent = t;
+        trabajosEl.appendChild(li);
+      });
+      document.getElementById('modal-trabajos-section').hidden = trabajos.length === 0;
+
+      document.getElementById('modal-observaciones').textContent = s.observaciones || '—';
+
+      const fotos = s.fotos || [];
+      const fotosEl = document.getElementById('modal-fotos');
+      fotosEl.innerHTML = '';
+      fotos.forEach(function(url){
+        const a = document.createElement('a');
+        a.href = url;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        const img = document.createElement('img');
+        img.src = url;
+        img.alt = 'Foto del servicio';
+        a.appendChild(img);
+        fotosEl.appendChild(a);
+      });
+      document.getElementById('modal-fotos-section').hidden = fotos.length === 0;
+
+      document.getElementById('servicio-modal').hidden = false;
+    }
+
+    document.getElementById('modal-close-btn').addEventListener('click', function(){
+      document.getElementById('servicio-modal').hidden = true;
+    });
+    document.getElementById('servicio-modal').addEventListener('click', function(e){
+      if(e.target.id === 'servicio-modal') e.currentTarget.hidden = true;
+    });
+
+    sPatente.addEventListener('blur', function(){
+      cargarHistorialServicios(sPatente.value.trim().toUpperCase());
     });
 
     // -- Fotos: redimensionar a máx. 1024x768 manteniendo relación de aspecto --
@@ -968,6 +1227,7 @@
         sMsg.textContent = 'Servicio guardado correctamente.';
         sMsg.className = 'form-msg ok';
         resetServicioForm();
+        cargarHistorialServicios(patente);
       }catch(err){
         sMsg.textContent = 'Error al guardar: ' + err.message;
         sMsg.className = 'form-msg err';
@@ -981,6 +1241,29 @@
     });
 
     checkSession();
-  </script>
+  </script>  <!-- MODAL VER SERVICIO -->
+  <div class="modal-overlay" id="servicio-modal" hidden>
+    <div class="modal-card">
+      <button type="button" class="modal-close" id="modal-close-btn">✕</button>
+      <h3 id="modal-tipo"></h3>
+      <p class="modal-sub" id="modal-sub"></p>
+
+      <div class="modal-section" id="modal-trabajos-section">
+        <h4>Trabajos Realizados</h4>
+        <ul class="modal-trabajos" id="modal-trabajos"></ul>
+      </div>
+
+      <div class="modal-section" id="modal-observaciones-section">
+        <h4>Observaciones</h4>
+        <p id="modal-observaciones"></p>
+      </div>
+
+      <div class="modal-section" id="modal-fotos-section">
+        <h4>Registro Fotográfico</h4>
+        <div class="modal-fotos" id="modal-fotos"></div>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
