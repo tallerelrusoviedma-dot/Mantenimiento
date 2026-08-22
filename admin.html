@@ -202,15 +202,42 @@
 
   .field-row{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
 
+  .tabla-toolbar{
+    display:flex;
+    justify-content:flex-end;
+    margin-bottom:12px;
+  }
+  .buscar-input{
+    width:240px;
+    max-width:100%;
+    background:#0a1830;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:9px 12px;
+    color:var(--white);
+    font-family:var(--font-tech);
+    font-size:13px;
+    font-weight:600;
+    outline:none;
+  }
+  .buscar-input:focus{ border-color:var(--blue-light); }
+  .buscar-input::placeholder{ color:#5b6879; font-weight:500; }
+
+  .tabla-scroll{
+    max-height:480px;
+    overflow-y:auto;
+    border:1px solid var(--line);
+    border-radius:16px;
+    background:linear-gradient(155deg, var(--card-bg-2), var(--card-bg));
+  }
   table{
     width:100%;
     border-collapse:collapse;
-    background:linear-gradient(155deg, var(--card-bg-2), var(--card-bg));
-    border:1px solid var(--line);
-    border-radius:16px;
-    overflow:hidden;
   }
   thead th{
+    position:sticky;
+    top:0;
+    z-index:1;
     text-align:left;
     font-family:var(--font-tech);
     font-size:11.5px;
@@ -218,6 +245,7 @@
     text-transform:uppercase;
     color:var(--silver);
     padding:14px 12px;
+    background:var(--card-bg-2);
     border-bottom:1px solid var(--line);
   }
   tbody td{
@@ -231,7 +259,7 @@
   tbody tr:last-child td{ border-bottom:none; }
   tbody td.patente-cell{ color:var(--blue-light); letter-spacing:0.06em; }
   .row-actions{ display:flex; gap:8px; }
-  #tabla-vacia{
+  #tabla-vacia, #tabla-sin-resultados{
     padding:22px;
     text-align:center;
     color:var(--silver);
@@ -606,6 +634,10 @@
           <label for="v-anio">Año</label>
           <input type="number" id="v-anio" placeholder="2018" min="1950" max="2100" required>
 
+          <label for="v-telefono">Teléfono</label>
+          <input type="tel" id="v-telefono" placeholder="2920 123456">
+          <p class="campo-hint">No se muestra en la página pública — es solo para uso interno del taller.</p>
+
           <div class="field-row">
             <div>
               <label for="v-aceite-actual">Aceite — actual (km)</label>
@@ -636,19 +668,25 @@
 
       <!-- Listado -->
       <div>
-        <table>
-          <thead>
-            <tr>
-              <th>Patente</th>
-              <th>Vehículo</th>
-              <th>Aceite</th>
-              <th>Distribución</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="tabla-body"></tbody>
-        </table>
+        <div class="tabla-toolbar">
+          <input type="text" id="buscar-patente" class="buscar-input" placeholder="Buscar patente, marca o modelo...">
+        </div>
+        <div class="tabla-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Patente</th>
+                <th>Vehículo</th>
+                <th>Aceite</th>
+                <th>Distribución</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="tabla-body"></tbody>
+          </table>
+        </div>
         <p id="tabla-vacia" hidden>Todavía no cargaste ninguna patente.</p>
+        <p id="tabla-sin-resultados" hidden>No hay patentes que coincidan con la búsqueda.</p>
 
         <div class="qr-section">
           <h2>Código QR del taller</h2>
@@ -787,6 +825,7 @@
     const vMarca         = document.getElementById('v-marca');
     const vModelo        = document.getElementById('v-modelo');
     const vAnio          = document.getElementById('v-anio');
+    const vTelefono      = document.getElementById('v-telefono');
     const vAceiteActual  = document.getElementById('v-aceite-actual');
     const vAceiteProximo = document.getElementById('v-aceite-proximo');
     const vDistActual    = document.getElementById('v-dist-actual');
@@ -855,21 +894,42 @@
       return div.innerHTML;
     }
 
+    let vehiculosCache = [];
+    const buscarInput = document.getElementById('buscar-patente');
+    const tablaSinResultados = document.getElementById('tabla-sin-resultados');
+
     async function cargarTabla(){
       const { data, error } = await supabaseClient
         .from('vehiculos')
         .select('*')
         .order('updated_at', { ascending:false });
 
-      tablaBody.innerHTML = '';
+      vehiculosCache = (!error && data) ? data : [];
 
-      if(error || !data || data.length === 0){
+      if(vehiculosCache.length === 0){
         tablaVacia.hidden = false;
+      } else {
+        tablaVacia.hidden = true;
+      }
+
+      buscarInput.value = '';
+      renderTablaVehiculos(vehiculosCache);
+    }
+
+    function renderTablaVehiculos(lista){
+      tablaBody.innerHTML = '';
+      tablaSinResultados.hidden = true;
+
+      if(vehiculosCache.length === 0){
         return;
       }
-      tablaVacia.hidden = true;
 
-      data.forEach(function(r){
+      if(lista.length === 0){
+        tablaSinResultados.hidden = false;
+        return;
+      }
+
+      lista.forEach(function(r){
         const tr = document.createElement('tr');
         const vehiculoTxt = escapeHtml((r.marca || '') + ' ' + (r.modelo || '')).trim() +
           (r.anio ? ' (' + r.anio + ')' : '');
@@ -888,7 +948,7 @@
       tablaBody.querySelectorAll('[data-edit]').forEach(function(btn){
         btn.addEventListener('click', function(){
           const patente = btn.getAttribute('data-edit');
-          const registro = data.find(function(x){ return x.patente === patente; });
+          const registro = vehiculosCache.find(function(x){ return x.patente === patente; });
           if(registro) cargarEnFormulario(registro);
         });
       });
@@ -903,6 +963,22 @@
       });
     }
 
+    buscarInput.addEventListener('input', function(){
+      const termino = buscarInput.value.trim().toLowerCase();
+      if(!termino){
+        renderTablaVehiculos(vehiculosCache);
+        return;
+      }
+      const filtrado = vehiculosCache.filter(function(r){
+        const texto = [r.patente, r.marca, r.modelo, r.anio]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase();
+        return texto.includes(termino);
+      });
+      renderTablaVehiculos(filtrado);
+    });
+
     function cargarEnFormulario(r){
       editandoPatente = r.patente;
       vPatente.value = r.patente;
@@ -910,6 +986,7 @@
       vMarca.value = r.marca || '';
       vModelo.value = r.modelo || '';
       vAnio.value = r.anio || '';
+      vTelefono.value = r.telefono || '';
       vAceiteActual.value = r.aceite_actual;
       vAceiteProximo.value = r.aceite_proximo;
       vDistActual.value = r.distribucion_actual;
@@ -948,6 +1025,7 @@
         marca: vMarca.value.trim(),
         modelo: vModelo.value.trim(),
         anio: Number(vAnio.value) || null,
+        telefono: vTelefono.value.trim() || null,
         aceite_actual: Number(vAceiteActual.value) || 0,
         aceite_proximo: Number(vAceiteProximo.value) || 0,
         distribucion_actual: Number(vDistActual.value) || 0,

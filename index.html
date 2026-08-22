@@ -776,7 +776,7 @@
 
     const { data, error } = await supabaseClient
       .from('vehiculos')
-      .select('*')
+      .select('patente,marca,modelo,anio,aceite_actual,aceite_proximo,distribucion_actual,distribucion_proximo')
       .eq('patente', patente)
       .maybeSingle();
 
