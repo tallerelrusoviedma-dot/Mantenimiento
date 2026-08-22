@@ -743,7 +743,13 @@
 
     const marcaModelo = [r.marca, r.modelo].filter(Boolean).join(' ');
     if(marcaModelo || r.anio){
-      vehiculoInfo.innerHTML = marcaModelo + (r.anio ? ' <span>(' + r.anio + ')</span>' : '');
+      vehiculoInfo.textContent = '';
+      vehiculoInfo.append(marcaModelo);
+      if(r.anio){
+        const span = document.createElement('span');
+        span.textContent = ' (' + r.anio + ')';
+        vehiculoInfo.appendChild(span);
+      }
       vehiculoInfo.hidden = false;
     } else {
       vehiculoInfo.hidden = true;

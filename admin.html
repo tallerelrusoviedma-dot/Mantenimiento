@@ -889,9 +889,12 @@
 
     // ---------- TABLA ----------
     function escapeHtml(str){
-      const div = document.createElement('div');
-      div.textContent = str;
-      return div.innerHTML;
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
     }
 
     let vehiculosCache = [];
@@ -931,16 +934,17 @@
 
       lista.forEach(function(r){
         const tr = document.createElement('tr');
+        const patenteSegura = escapeHtml(r.patente);
         const vehiculoTxt = escapeHtml((r.marca || '') + ' ' + (r.modelo || '')).trim() +
-          (r.anio ? ' (' + r.anio + ')' : '');
+          (r.anio ? ' (' + Number(r.anio) + ')' : '');
         tr.innerHTML =
-          '<td class="patente-cell">' + r.patente + '</td>' +
+          '<td class="patente-cell">' + patenteSegura + '</td>' +
           '<td>' + (vehiculoTxt || '—') + '</td>' +
-          '<td>' + r.aceite_actual + ' → ' + r.aceite_proximo + ' km</td>' +
-          '<td>' + r.distribucion_actual + ' → ' + r.distribucion_proximo + ' km</td>' +
+          '<td>' + Number(r.aceite_actual) + ' → ' + Number(r.aceite_proximo) + ' km</td>' +
+          '<td>' + Number(r.distribucion_actual) + ' → ' + Number(r.distribucion_proximo) + ' km</td>' +
           '<td class="row-actions">' +
-            '<button type="button" class="btn-secondary" data-edit="' + r.patente + '">Editar</button>' +
-            '<button type="button" class="btn-danger" data-del="' + r.patente + '">Borrar</button>' +
+            '<button type="button" class="btn-secondary" data-edit="' + patenteSegura + '">Editar</button>' +
+            '<button type="button" class="btn-danger" data-del="' + patenteSegura + '">Borrar</button>' +
           '</td>';
         tablaBody.appendChild(tr);
       });
