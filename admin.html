@@ -104,6 +104,34 @@
   input:focus{ border-color:var(--blue-light); }
   input::placeholder{ color:#5b6879; font-weight:500; }
 
+  select, textarea{
+    width:100%;
+    background:#0a1830;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:12px 14px;
+    color:var(--white);
+    font-family:var(--font-tech);
+    font-size:15px;
+    font-weight:600;
+    outline:none;
+  }
+  select:focus, textarea:focus{ border-color:var(--blue-light); }
+  textarea{ resize:vertical; min-height:80px; font-family:var(--font-body); font-weight:400; font-size:14px; }
+  select{ appearance:none; cursor:pointer; }
+
+  input[type="file"]{
+    width:100%;
+    background:#0a1830;
+    border:1px dashed var(--line);
+    border-radius:8px;
+    padding:14px;
+    color:var(--silver);
+    font-family:var(--font-body);
+    font-size:13px;
+    cursor:pointer;
+  }
+
   button{
     font-family:var(--font-tech);
     font-weight:700;
@@ -263,6 +291,101 @@
 
   #print-qr-btn{ margin-top:18px; }
 
+  /* ---------- GENERAR SERVICIO ---------- */
+  .servicio-section{
+    width:100%;
+    max-width:960px;
+    margin-top:32px;
+    background:linear-gradient(155deg, var(--card-bg-2), var(--card-bg));
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:28px;
+  }
+  .servicio-section h2{
+    font-family:var(--font-display);
+    font-weight:400;
+    font-size:22px;
+    letter-spacing:0.02em;
+    text-transform:uppercase;
+    margin-bottom:20px;
+    color:var(--white);
+  }
+
+  .trabajo-row{ display:flex; gap:10px; align-items:flex-start; }
+  .trabajo-row input{ flex:1; }
+  .btn-add-trabajo{
+    flex-shrink:0;
+    padding:0 18px;
+    height:47px;
+    color:#0c1420;
+    background:linear-gradient(180deg, #4aa3f0, var(--blue) 60%, #0a5fa8);
+  }
+
+  .trabajos-list{
+    list-style:none;
+    margin-top:12px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .trabajos-list li{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    background:#0a1830;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px 12px;
+    font-family:var(--font-body);
+    font-size:13.5px;
+    color:var(--white);
+  }
+  .trabajos-list li button{
+    background:none;
+    color:var(--red);
+    font-size:16px;
+    line-height:1;
+    padding:2px 6px;
+    flex-shrink:0;
+  }
+
+  .fotos-grid{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:12px;
+  }
+  .foto-thumb{
+    position:relative;
+    width:84px;
+    height:84px;
+    border-radius:8px;
+    overflow:hidden;
+    border:1px solid var(--line);
+  }
+  .foto-thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .foto-thumb button{
+    position:absolute;
+    top:2px;
+    right:2px;
+    width:20px;
+    height:20px;
+    border-radius:50%;
+    background:rgba(10,16,28,0.85);
+    color:#fff;
+    font-size:12px;
+    line-height:1;
+    padding:0;
+  }
+
+  .campo-hint{
+    font-family:var(--font-body);
+    font-size:12px;
+    color:#5b6879;
+    margin-top:6px;
+  }
+
   @media print{
     body *{ visibility:hidden; }
     .qr-print-card, .qr-print-card *{ visibility:visible; }
@@ -383,6 +506,64 @@
           <button type="button" class="btn-secondary" id="print-qr-btn">Imprimir Código QR</button>
         </div>
       </div>
+    </div>
+
+    <!-- GENERAR SERVICIO -->
+    <div class="servicio-section">
+      <h2>Generar Servicio:</h2>
+      <form id="servicio-form">
+        <label for="s-patente">Patente</label>
+        <input type="text" id="s-patente" placeholder="AB123CD" maxlength="8" required>
+        <p class="campo-hint">Se completa sola si tocaste "Editar" en una patente de la tabla de arriba.</p>
+
+        <label for="s-fecha">Fecha de Servicio</label>
+        <input type="date" id="s-fecha" required>
+
+        <label for="s-tipo">Tipo de Servicio</label>
+        <select id="s-tipo" required>
+          <option value="" disabled selected>Seleccioná una opción</option>
+          <option>Cepillado de tapa de cilindro</option>
+          <option>Cepillado de block</option>
+          <option>Cepillado de tapa y block</option>
+          <option>Armado de motor</option>
+          <option>Cambio de juntas</option>
+          <option>Cambio de aceite y filtros</option>
+          <option>Mantenimiento preventivo</option>
+          <option>Diagnóstico general</option>
+          <option>Rectificación de cigüeñal</option>
+          <option>Rectificación de bielas</option>
+          <option>Cambio de distribución</option>
+          <option>Reparación de culata</option>
+          <option>Tren delantero</option>
+          <option>Tren trasero</option>
+          <option>Transmisión</option>
+          <option>Frenos</option>
+          <option>Sistema de escape</option>
+          <option>Sistema eléctrico</option>
+          <option>Sistema de refrigeración</option>
+          <option>Dirección</option>
+          <option>Embrague</option>
+          <option>Otros</option>
+        </select>
+
+        <label for="s-trabajo-input">Trabajos Realizados</label>
+        <div class="trabajo-row">
+          <input type="text" id="s-trabajo-input" placeholder="Ej: cambio de junta de tapa de cilindro">
+          <button type="button" class="btn-add-trabajo" id="s-trabajo-add">Agregar Trabajo</button>
+        </div>
+        <ul class="trabajos-list" id="s-trabajos-list"></ul>
+
+        <label for="s-observaciones">Observaciones</label>
+        <textarea id="s-observaciones" placeholder="Notas adicionales sobre el servicio..."></textarea>
+
+        <label for="s-fotos">Registro Fotográfico — Adjuntar imagen</label>
+        <input type="file" id="s-fotos" accept="image/*" multiple>
+        <p class="campo-hint">Las fotos se comprimen automáticamente a un máximo de 1024×768 antes de subirlas, manteniendo su relación de aspecto.</p>
+        <div class="fotos-grid" id="s-fotos-grid"></div>
+
+        <button type="submit" class="btn-primary" id="s-submit-btn">Guardar Servicio</button>
+        <p class="form-msg" id="servicio-msg" aria-live="polite"></p>
+      </form>
     </div>
   </section>
 
@@ -548,6 +729,7 @@
       vSubmitBtn.textContent = 'Guardar cambios';
       vCancelBtn.style.display = 'block';
       vMsg.textContent = '';
+      sPatente.value = r.patente;
     }
 
     function resetFormulario(){
@@ -600,6 +782,202 @@
 
     vPatente.addEventListener('input', function(){
       vPatente.value = vPatente.value.toUpperCase();
+    });
+
+    // ---------- GENERAR SERVICIO ----------
+    const sForm          = document.getElementById('servicio-form');
+    const sPatente        = document.getElementById('s-patente');
+    const sFecha           = document.getElementById('s-fecha');
+    const sTipo             = document.getElementById('s-tipo');
+    const sTrabajoInput      = document.getElementById('s-trabajo-input');
+    const sTrabajoAddBtn      = document.getElementById('s-trabajo-add');
+    const sTrabajosList        = document.getElementById('s-trabajos-list');
+    const sObservaciones         = document.getElementById('s-observaciones');
+    const sFotosInput             = document.getElementById('s-fotos');
+    const sFotosGrid                = document.getElementById('s-fotos-grid');
+    const sSubmitBtn                  = document.getElementById('s-submit-btn');
+    const sMsg                         = document.getElementById('servicio-msg');
+
+    let trabajos = [];
+    let fotosPendientes = []; // { blob, previewUrl }
+
+    function hoyISO(){
+      const d = new Date();
+      const tz = d.getTimezoneOffset() * 60000;
+      return new Date(d - tz).toISOString().slice(0, 10);
+    }
+    sFecha.value = hoyISO();
+
+    // -- Trabajos realizados (lista dinámica) --
+    function renderTrabajos(){
+      sTrabajosList.innerHTML = '';
+      trabajos.forEach(function(t, i){
+        const li = document.createElement('li');
+        const span = document.createElement('span');
+        span.textContent = t;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = '✕';
+        btn.addEventListener('click', function(){
+          trabajos.splice(i, 1);
+          renderTrabajos();
+        });
+        li.appendChild(span);
+        li.appendChild(btn);
+        sTrabajosList.appendChild(li);
+      });
+    }
+
+    function agregarTrabajo(){
+      const val = sTrabajoInput.value.trim();
+      if(!val) return;
+      trabajos.push(val);
+      sTrabajoInput.value = '';
+      renderTrabajos();
+      sTrabajoInput.focus();
+    }
+
+    sTrabajoAddBtn.addEventListener('click', agregarTrabajo);
+    sTrabajoInput.addEventListener('keydown', function(e){
+      if(e.key === 'Enter'){
+        e.preventDefault();
+        agregarTrabajo();
+      }
+    });
+
+    // -- Fotos: redimensionar a máx. 1024x768 manteniendo relación de aspecto --
+    function redimensionarImagen(file, maxW, maxH){
+      return new Promise(function(resolve, reject){
+        const reader = new FileReader();
+        reader.onload = function(e){
+          const img = new Image();
+          img.onload = function(){
+            const ratio = Math.min(maxW / img.width, maxH / img.height, 1);
+            const w = Math.round(img.width * ratio);
+            const h = Math.round(img.height * ratio);
+            const canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            canvas.toBlob(function(blob){
+              blob ? resolve(blob) : reject(new Error('No se pudo procesar la imagen'));
+            }, 'image/jpeg', 0.85);
+          };
+          img.onerror = function(){ reject(new Error('No se pudo leer la imagen')); };
+          img.src = e.target.result;
+        };
+        reader.onerror = function(){ reject(new Error('No se pudo leer el archivo')); };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function renderFotosGrid(){
+      sFotosGrid.innerHTML = '';
+      fotosPendientes.forEach(function(f, i){
+        const div = document.createElement('div');
+        div.className = 'foto-thumb';
+        const img = document.createElement('img');
+        img.src = f.previewUrl;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = '✕';
+        btn.addEventListener('click', function(){
+          URL.revokeObjectURL(f.previewUrl);
+          fotosPendientes.splice(i, 1);
+          renderFotosGrid();
+        });
+        div.appendChild(img);
+        div.appendChild(btn);
+        sFotosGrid.appendChild(div);
+      });
+    }
+
+    sFotosInput.addEventListener('change', async function(){
+      const files = Array.from(sFotosInput.files || []);
+      sFotosInput.value = '';
+      for(const file of files){
+        try{
+          const blob = await redimensionarImagen(file, 1024, 768);
+          fotosPendientes.push({ blob: blob, previewUrl: URL.createObjectURL(blob) });
+        }catch(err){
+          console.error(err);
+        }
+      }
+      renderFotosGrid();
+    });
+
+    function resetServicioForm(){
+      trabajos = [];
+      fotosPendientes.forEach(function(f){ URL.revokeObjectURL(f.previewUrl); });
+      fotosPendientes = [];
+      renderTrabajos();
+      renderFotosGrid();
+      sTipo.value = '';
+      sObservaciones.value = '';
+      sFecha.value = hoyISO();
+      sTrabajoInput.value = '';
+    }
+
+    sForm.addEventListener('submit', async function(e){
+      e.preventDefault();
+      const patente = sPatente.value.trim().toUpperCase().replace(/\s+/g, '');
+
+      if(!patente){
+        sMsg.textContent = 'La patente es obligatoria.';
+        sMsg.className = 'form-msg err';
+        return;
+      }
+      if(!sTipo.value){
+        sMsg.textContent = 'Elegí un tipo de servicio.';
+        sMsg.className = 'form-msg err';
+        return;
+      }
+
+      sSubmitBtn.disabled = true;
+      sMsg.textContent = 'Guardando...';
+      sMsg.className = 'form-msg';
+
+      try{
+        const fotosUrls = [];
+        for(let i = 0; i < fotosPendientes.length; i++){
+          const path = patente + '/' + Date.now() + '-' + i + '.jpg';
+          const { error: uploadError } = await supabaseClient
+            .storage
+            .from('fotos-servicios')
+            .upload(path, fotosPendientes[i].blob, { contentType: 'image/jpeg' });
+          if(uploadError) throw uploadError;
+          const { data: urlData } = supabaseClient
+            .storage
+            .from('fotos-servicios')
+            .getPublicUrl(path);
+          fotosUrls.push(urlData.publicUrl);
+        }
+
+        const { error: insertError } = await supabaseClient
+          .from('servicios')
+          .insert({
+            patente: patente,
+            fecha_servicio: sFecha.value,
+            tipo_servicio: sTipo.value,
+            trabajos_realizados: trabajos,
+            observaciones: sObservaciones.value.trim() || null,
+            fotos: fotosUrls
+          });
+        if(insertError) throw insertError;
+
+        sMsg.textContent = 'Servicio guardado correctamente.';
+        sMsg.className = 'form-msg ok';
+        resetServicioForm();
+      }catch(err){
+        sMsg.textContent = 'Error al guardar: ' + err.message;
+        sMsg.className = 'form-msg err';
+      }finally{
+        sSubmitBtn.disabled = false;
+      }
+    });
+
+    sPatente.addEventListener('input', function(){
+      sPatente.value = sPatente.value.toUpperCase();
     });
 
     checkSession();
