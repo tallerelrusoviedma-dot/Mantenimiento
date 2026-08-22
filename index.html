@@ -239,6 +239,20 @@
   .lookup-msg.ok{ color:#5fd88a; }
   .lookup-msg.err{ color:#ff7a6b; }
 
+  .vehiculo-info{
+    width:100%;
+    max-width:960px;
+    margin-top:30px;
+    text-align:center;
+    font-family:var(--font-tech);
+    font-weight:700;
+    font-size:19px;
+    letter-spacing:0.03em;
+    color:var(--white);
+  }
+  .vehiculo-info[hidden]{ display:none; }
+  .vehiculo-info span{ color:var(--blue-light); }
+
   /* ---------- WHATSAPP CTA ---------- */
   .whatsapp-wrap{
     width:100%;
@@ -426,6 +440,8 @@
       <p class="lookup-msg" id="lookup-msg" aria-live="polite"></p>
     </section>
 
+    <p class="vehiculo-info" id="vehiculo-info" hidden></p>
+
     <section class="cards" id="cards" hidden>
       <article class="card card-aceite">
         <div class="bolt bolt-tl"></div>
@@ -486,6 +502,7 @@
   const btn = document.querySelector('.btn-verificar');
   const msg = document.getElementById('lookup-msg');
   const cards = document.getElementById('cards');
+  const vehiculoInfo = document.getElementById('vehiculo-info');
   const whatsappWrap = document.getElementById('whatsapp-wrap');
   const whatsappBtn = document.getElementById('whatsapp-btn');
 
@@ -500,6 +517,14 @@
     document.getElementById('distribucion-proximo').textContent = pad(r.distribucion_proximo);
     cards.hidden = false;
 
+    const marcaModelo = [r.marca, r.modelo].filter(Boolean).join(' ');
+    if(marcaModelo || r.anio){
+      vehiculoInfo.innerHTML = marcaModelo + (r.anio ? ' <span>(' + r.anio + ')</span>' : '');
+      vehiculoInfo.hidden = false;
+    } else {
+      vehiculoInfo.hidden = true;
+    }
+
     const mensaje = 'Hola! Quiero solicitar un turno de servicio para mi vehículo, patente ' + r.patente + '.';
     whatsappBtn.href = 'https://wa.me/' + WHATSAPP_NUMERO + '?text=' + encodeURIComponent(mensaje);
     whatsappWrap.hidden = false;
@@ -513,6 +538,7 @@
       msg.textContent = 'Ingresá una patente para continuar.';
       msg.className = 'lookup-msg err';
       cards.hidden = true;
+      vehiculoInfo.hidden = true;
       whatsappWrap.hidden = true;
       return;
     }
@@ -533,6 +559,7 @@
       msg.textContent = 'Ocurrió un error al consultar. Probá de nuevo.';
       msg.className = 'lookup-msg err';
       cards.hidden = true;
+      vehiculoInfo.hidden = true;
       whatsappWrap.hidden = true;
       return;
     }
@@ -545,6 +572,7 @@
       msg.textContent = 'No encontramos esa patente en nuestros registros.';
       msg.className = 'lookup-msg err';
       cards.hidden = true;
+      vehiculoInfo.hidden = true;
       whatsappWrap.hidden = true;
     }
   });
