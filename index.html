@@ -350,9 +350,9 @@
 
   .servicio-fecha{
     font-family:var(--font-tech);
-    font-weight:600;
-    font-size:13px;
-    color:var(--silver);
+    font-weight:700;
+    font-size:19px;
+    color:var(--orange);
     letter-spacing:0.03em;
   }
 
@@ -481,7 +481,7 @@
     padding-bottom:12px;
   }
 
-  .stat:last-child{ border-bottom:none; padding-bottom:0; }
+  .stat:last-of-type{ border-bottom:none; padding-bottom:0; }
 
   .stat-label{
     font-family:var(--font-body);
@@ -506,6 +506,22 @@
     font-weight:600;
     font-size:13px;
     color:var(--silver);
+  }
+
+  .stat-fecha{
+    margin-top:14px;
+    padding-top:12px;
+    border-top:1px dashed var(--line);
+    font-family:var(--font-body);
+    font-size:12px;
+    color:var(--silver);
+  }
+  .stat-fecha[hidden]{ display:none; }
+  .stat-fecha b{ color:var(--white); font-weight:600; }
+  .stat-fecha.sin-separador{
+    margin-top:4px;
+    padding-top:0;
+    border-top:none;
   }
 
   .card-distribucion .stat-value{ color:#ffb44d; }
@@ -575,6 +591,8 @@
             <span class="stat-value" id="aceite-proximo">00000000</span>
             <span class="stat-unit">km</span>
           </div>
+          <p class="stat-fecha" id="aceite-fecha" hidden></p>
+          <p class="stat-fecha" id="aceite-graduacion" hidden></p>
         </div>
       </article>
 
@@ -593,6 +611,7 @@
             <span class="stat-value" id="distribucion-proximo">00000000</span>
             <span class="stat-unit">km</span>
           </div>
+          <p class="stat-fecha" id="distribucion-fecha" hidden></p>
         </div>
       </article>
     </section>
@@ -741,6 +760,43 @@
     document.getElementById('distribucion-proximo').textContent = pad(r.distribucion_proximo);
     cards.hidden = false;
 
+    const aceiteFechaEl = document.getElementById('aceite-fecha');
+    if(r.aceite_fecha_ultimo){
+      aceiteFechaEl.innerHTML = '';
+      aceiteFechaEl.append('Último cambio: ');
+      const b1 = document.createElement('b');
+      b1.textContent = formatearFecha(r.aceite_fecha_ultimo);
+      aceiteFechaEl.appendChild(b1);
+      aceiteFechaEl.hidden = false;
+    } else {
+      aceiteFechaEl.hidden = true;
+    }
+
+    const aceiteGradEl = document.getElementById('aceite-graduacion');
+    if(r.aceite_graduacion){
+      aceiteGradEl.innerHTML = '';
+      aceiteGradEl.append('Graduación: ');
+      const bg = document.createElement('b');
+      bg.textContent = r.aceite_graduacion;
+      aceiteGradEl.appendChild(bg);
+      aceiteGradEl.hidden = false;
+      aceiteGradEl.classList.toggle('sin-separador', !aceiteFechaEl.hidden);
+    } else {
+      aceiteGradEl.hidden = true;
+    }
+
+    const distFechaEl = document.getElementById('distribucion-fecha');
+    if(r.distribucion_fecha_ultimo){
+      distFechaEl.innerHTML = '';
+      distFechaEl.append('Último cambio: ');
+      const b2 = document.createElement('b');
+      b2.textContent = formatearFecha(r.distribucion_fecha_ultimo);
+      distFechaEl.appendChild(b2);
+      distFechaEl.hidden = false;
+    } else {
+      distFechaEl.hidden = true;
+    }
+
     const marcaModelo = [r.marca, r.modelo].filter(Boolean).join(' ');
     if(marcaModelo || r.anio){
       vehiculoInfo.textContent = '';
@@ -782,7 +838,7 @@
 
     const { data, error } = await supabaseClient
       .from('vehiculos')
-      .select('patente,marca,modelo,anio,aceite_actual,aceite_proximo,distribucion_actual,distribucion_proximo')
+      .select('patente,marca,modelo,anio,aceite_actual,aceite_proximo,aceite_fecha_ultimo,aceite_graduacion,distribucion_actual,distribucion_proximo,distribucion_fecha_ultimo')
       .eq('patente', patente)
       .maybeSingle();
 
